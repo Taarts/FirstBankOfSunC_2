@@ -116,6 +116,7 @@ namespace FirstBankOfSuncoast
             switch (accountType)
             {
                 case AccountType.Checking:
+
                     break;
                 case AccountType.Savings:
                     break;
@@ -127,8 +128,8 @@ namespace FirstBankOfSuncoast
             switch (accountType)
             {
                 case AccountType.Checking:
-
-                    break;
+                    foreach (var transaction in transactions)
+                        break;
                 case AccountType.Savings:
                     break;
             }
