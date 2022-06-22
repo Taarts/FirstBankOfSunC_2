@@ -55,9 +55,7 @@ namespace FirstBankOfSuncoast
 
         static void Main(string[] args)
         {
-
-            // public static Transactions = new List<Transaction>();
-
+            Introduction();
 
             var fileReader = new StreamReader("Transactions.csv");
             var csvReader = new CsvReader(fileReader, CultureInfo.InvariantCulture);
@@ -97,6 +95,11 @@ namespace FirstBankOfSuncoast
 
         }
 
+        private static void Introduction()
+        {
+            Console.WriteLine("\n\nWelcome to First Suncoast Bank. \n\n");
+        }
+
         public static void CheckingMenu()
         {
             var checkingAnswer = PromptForMenuString("What would you like to do? (V)iew balance (D)eposit (W)ithdraw \n");
@@ -133,17 +136,23 @@ namespace FirstBankOfSuncoast
             switch (accountType)
             {
                 case AccountType.Checking:
-                    var newTransaction = new Transaction();
-                    var depositAmount = PromptForInteger("How much would you like to deposit? ");
-                    newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and Than you");
-                    newTransaction.Date = DateTime.Now;
-                    newTransaction.Amount = depositAmount;
-                    newTransaction.Type = TransactionType.Credit;
-                    Transactions.Add(newTransaction);
+                    DepositPrompts();
                     break;
                 case AccountType.Savings:
+                    DepositPrompts();
                     break;
             }
+        }
+
+        private static void DepositPrompts()
+        {
+            var newTransaction = new Transaction();
+            var depositAmount = PromptForInteger("How much would you like to deposit? ");
+            newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and Than you");
+            newTransaction.Date = DateTime.Now;
+            newTransaction.Amount = depositAmount;
+            newTransaction.Type = TransactionType.Credit;
+            Transactions.Add(newTransaction);
         }
 
         public static void ShowBalance(AccountType accountType)
