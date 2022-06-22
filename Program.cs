@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-
+using System.Linq;
 using CsvHelper;
 
 namespace FirstBankOfSuncoast
@@ -11,20 +11,33 @@ namespace FirstBankOfSuncoast
     {
         Checking, Savings
     }
-
+    enum TransactionType
+    {
+        Debit, Credit
+    }
     class Program
     {
         static string PromptForString(string prompt)
         {
             Console.Write(prompt);
+            Console.Write("\n> ");
+            return Console.ReadLine();
+
+        }
+        static string PromptForMenuString(string prompt)
+        {
+            Console.Write(prompt);
+            Console.Write("\n> ");
             var userInput = Console.ReadLine();
 
             return userInput.ToUpper();
         }
 
+
         static int PromptForInteger(string prompt)
         {
             Console.Write(prompt);
+            Console.Write("\n> ");
             int userInput;
             var isThisGoodInput = Int32.TryParse(Console.ReadLine(), out userInput);
 
@@ -38,30 +51,36 @@ namespace FirstBankOfSuncoast
                 return 0;
             }
         }
+        public static List<Transaction> Transactions = new List<Transaction>();
 
         static void Main(string[] args)
         {
 
-            var transactions = new List<Transaction>();
-
-            var fileWriter = new StreamWriter("Transactions.csv");
-            var csvWriter = new CsvWriter(fileWriter, CultureInfo.InvariantCulture);
-            csvWriter.WriteRecords(transactions);
+            // public static Transactions = new List<Transaction>();
 
 
+            var fileReader = new StreamReader("Transactions.csv");
+            var csvReader = new CsvReader(fileReader, CultureInfo.InvariantCulture);
+            Transactions = csvReader.GetRecords<Transaction>().ToList();
+            fileReader.Close();
 
             var keepGoing = true;
             while (keepGoing)
             {
 
-                var userAnswer = PromptForString("Which account do you want? \n(C)hecking \n(S)avings \n(V)iew balance \n(Q)uit ");
+                var userAnswer = PromptForMenuString("Which account do you want? \n(C)hecking \n(S)avings \n(V)iew balance \n(Q)uit\n> ");
 
                 // to (V)iew
                 switch (userAnswer)
                 {
                     case "Q":
                         keepGoing = false;
+                        var fileWriter = new StreamWriter("Transactions.csv");
+                        var csvWriter = new CsvWriter(fileWriter, CultureInfo.InvariantCulture);
+                        csvWriter.WriteRecords(Transactions);
+                        fileWriter.Close();
                         break;
+
                     case "C":
                         CheckingMenu();
                         break;
@@ -74,15 +93,13 @@ namespace FirstBankOfSuncoast
                         Console.WriteLine("☠️ ☠️ ☠️ ☠️ ☠️ NOPE! ☠️ ☠️ ☠️ ☠️ ☠️");
                         break;
                 }
-
             }
 
-            fileWriter.Close();
         }
 
         public static void CheckingMenu()
         {
-            var checkingAnswer = PromptForString("What would you like to do? (V)iew balance (D)eposit (W)ithdraw \n");
+            var checkingAnswer = PromptForMenuString("What would you like to do? (V)iew balance (D)eposit (W)ithdraw \n");
             switch (checkingAnswer)
             {
                 case "V":
@@ -116,7 +133,13 @@ namespace FirstBankOfSuncoast
             switch (accountType)
             {
                 case AccountType.Checking:
-
+                    var newTransaction = new Transaction();
+                    var depositAmount = PromptForInteger("How much would you like to deposit? ");
+                    newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and Than you");
+                    newTransaction.Date = DateTime.Now;
+                    newTransaction.Amount = depositAmount;
+                    newTransaction.Type = TransactionType.Credit;
+                    Transactions.Add(newTransaction);
                     break;
                 case AccountType.Savings:
                     break;
@@ -128,8 +151,11 @@ namespace FirstBankOfSuncoast
             switch (accountType)
             {
                 case AccountType.Checking:
-                    foreach (var transaction in transactions)
-                        break;
+                    foreach (var transaction in Transactions.Where(transaction => transaction.Account == AccountType.Checking))
+                    {
+                        Console.WriteLine($"{transaction.Date} | {transaction.Memo}\t\t ${transaction.Amount} ");
+                    }
+                    break;
                 case AccountType.Savings:
                     break;
             }
