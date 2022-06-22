@@ -12,7 +12,7 @@ namespace FirstBankOfSuncoast
         // memo (Duke NRG, Trans#)
         public string Memo { get; set; }
         // type (withdraw or deposit)
-        public string Type { get; set; }
+        public TransactionType Type { get; set; }
         // account type (C,S)
         public AccountType Account { get; set; }
     }
