@@ -7,6 +7,8 @@ using CsvHelper;
 
 namespace FirstBankOfSuncoast
 {
+    // enum is a data type that you define yourself, when you have a list of options for something that you can enumerate: days of the week...list of things... account types, transaction types.
+
     enum AccountType
     {
         Checking, Savings
@@ -93,6 +95,7 @@ namespace FirstBankOfSuncoast
                 }
             }
 
+
         }
 
         private static void Introduction()
@@ -102,17 +105,20 @@ namespace FirstBankOfSuncoast
 
         public static void CheckingMenu()
         {
-            var checkingAnswer = PromptForMenuString("What would you like to do? (V)iew balance (D)eposit (W)ithdraw \n");
+            var checkingAnswer = PromptForMenuString("What would you like to do? (S)ummarize Transactions (V)iew balance (D)eposit (W)ithdraw \n");
             switch (checkingAnswer)
             {
                 case "V":
-                    ShowBalance(AccountType.Checking);
+                    // ShowBalance(AccountType.Checking);
                     break;
                 case "D":
                     DepositFunds(AccountType.Checking);
                     break;
                 case "W":
                     WithdrawFunds(AccountType.Checking);
+                    break;
+                case "S":
+                    SummaryTransaction(AccountType.Checking);
                     break;
                 default:
                     Console.WriteLine($"Wrong answer! Back to the main menu with you. 🥾💥 ");
@@ -122,40 +128,64 @@ namespace FirstBankOfSuncoast
 
         public static void WithdrawFunds(AccountType accountType)
         {
-            switch (accountType)
+            var newTransaction = new Transaction();
+            var withdrawAmount = PromptForInteger("How much would you like to withdraw? ");
+            var creditTotal = ShowBalance(accountType);
+            if (withdrawAmount < creditTotal)
             {
-                case AccountType.Checking:
-                    break;
-                case AccountType.Savings:
-                    break;
+                newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and thank you");
+                newTransaction.Date = DateTime.Now;
+                newTransaction.Amount = withdrawAmount;
+                newTransaction.Type = TransactionType.Debit;
+                newTransaction.Account = accountType;
+                Transactions.Add(newTransaction);
+            }
+            else
+            {
+                Console.WriteLine($"Insufficient Funds Available. Your Total {accountType} balance is {ShowBalance(accountType)}.");
+
             }
         }
 
         public static void DepositFunds(AccountType accountType)
         {
-            switch (accountType)
-            {
-                case AccountType.Checking:
-                    DepositPrompts();
-                    break;
-                case AccountType.Savings:
-                    DepositPrompts();
-                    break;
-            }
-        }
-
-        private static void DepositPrompts()
-        {
             var newTransaction = new Transaction();
             var depositAmount = PromptForInteger("How much would you like to deposit? ");
-            newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and Than you");
+            newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and thank you");
             newTransaction.Date = DateTime.Now;
             newTransaction.Amount = depositAmount;
             newTransaction.Type = TransactionType.Credit;
+            newTransaction.Account = accountType;
             Transactions.Add(newTransaction);
+            // switch (accountType)
+            // {
+            //     case AccountType.Checking:
+            //         DepositPrompts();
+            //         break;
+            //     case AccountType.Savings:
+            //         DepositPrompts();
+            //         break;
+            // }
         }
 
-        public static void ShowBalance(AccountType accountType)
+        // private static void DepositPrompts()
+        // {
+        //     var newTransaction = new Transaction();
+        //     var depositAmount = PromptForInteger("How much would you like to deposit? ");
+        //     newTransaction.Memo = PromptForString("Please enter a memo for this transaction, and thank you");
+        //     newTransaction.Date = DateTime.Now;
+        //     newTransaction.Amount = depositAmount;
+        //     newTransaction.Type = TransactionType.Credit;
+        //     Transactions.Add(newTransaction);
+        // }
+        public static int ShowBalance(AccountType accountType)
+        {
+            var creditTotal = Transactions.Where(tx => tx.Type == TransactionType.Credit && tx.Account == accountType).Sum(tx => tx.Amount);
+            var debitTotal = Transactions.Where(tx => tx.Type == TransactionType.Debit && tx.Account == accountType).Sum(tx => tx.Amount);
+            return creditTotal - debitTotal;
+        }
+
+        public static void SummaryTransaction(AccountType accountType)
         {
             switch (accountType)
             {
@@ -172,7 +202,7 @@ namespace FirstBankOfSuncoast
 
         public static void SavingsMenu()
         {
-            var savingsAnswer = PromptForString("What would you like to do? (V)iew balance (D)eposit (W)ithdraw \n");
+            var savingsAnswer = PromptForMenuString("What would you like to do? (V)iew balance (D)eposit (W)ithdraw \n");
             switch (savingsAnswer)
             {
                 case "V":
@@ -184,6 +214,7 @@ namespace FirstBankOfSuncoast
                 case "W":
                     WithdrawFunds(AccountType.Savings);
                     break;
+
                 default:
                     Console.WriteLine($"Wrong answer! Back to the main menu with you. 🥾💥 ");
                     break;

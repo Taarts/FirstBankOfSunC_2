@@ -1,3 +1,8 @@
 Amount,Memo,Type,Account
 5000,monkeys,Credit,Checking
 9000,Understudy,Credit,Checking
+500,Thank you,Credit,Checking
+400,Birthday money,Credit,Savings
+0,I made a mistake,Credit,Checking
+900,Gold teeth,Debit,Checking
+100,birthday mooney,Debit,Checking
